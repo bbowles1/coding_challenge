@@ -1,5 +1,5 @@
 # Tempus Coding Challenge
-Having trouble running any part of this code? Please contact me at bbowles1@alumni.nd.edu. In a hurry? Run the script in "test" mode (`python vcf_annot.py -i <input_file> -t`) for faster code execution.
+Having trouble running any part of this code? Please contact me at bbowles1@alumni.nd.edu. In a hurry? Run the script in "test" mode (`python vcf_annot.py -i <input_file> -t`) for faster execution. Curious about underlying design decisions? Take a look at the `Tempus_Demo.html` document.
 
 ## Running the Annotation Pipeline
 The general syntax for annotating an input VCF file is to run `python vcf_annot.py -i <input_file> -o <output_file>`. Users can also specify the following options:
@@ -16,13 +16,13 @@ The general syntax for annotating an input VCF file is to run `python vcf_annot.
   + variant effect (missense, silent, intergenic, etc.)
 5. The minor allele frequency of the variant if available.
 
-### Files
-This repository contains the following files:
+### File Descriptions
 + *vcf_annot.py*: The main annotation script for VCF 4.0 files.
 + *annot.tsv*: An annotated list of variants initially given in the `test_vcf_data.txt`
 + *Tempus_Demo.ipynb*: a Jupyter notebook walking through some of the design decisions for the variant interpreter.
 + *Tempus_Demo.html*: saved .html output from Tempus_Demo.ipynb.
 + *env.yml*: a full list of the dev environment packages for reference.
++ *modles/tempustools*: multiple helper functions for VCF file process, API queries. 
 
 ### Dependencies
 This code is designed to run with minimal dependencies. You will require an installation of the `requests` and `pandas` python libraries (preferably pandas 1.4). A full list of dependencies and my python version can be found in the env.yml file.
