@@ -2,6 +2,8 @@
 Having trouble running any part of this code? Please contact me at bbowles1@alumni.nd.edu. 
 In a hurry? Run the script in "test" mode (`python vcf_annot.py -i <input_file> -t`) for faster execution. Curious about underlying design decisions? Take a look at the `Tempus_Demo.html` document.
 
+All code is avaailable at github.com/bbowles1/coding_challenge.
+
 ## Running the Annotation Pipeline
 The general syntax for annotating an input VCF file is to run `python vcf_annot.py -i <input_file> -o <output_file>`. Users can also specify the following options:
 -t: Run in "test mode," where a random subset of 250 input variants is selected to demo the pipeline functionality. 
