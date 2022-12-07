@@ -1,5 +1,6 @@
 # Tempus Coding Challenge
-Having trouble running any part of this code? Please contact me at bbowles1@alumni.nd.edu. In a hurry? Run the script in "test" mode (`python vcf_annot.py -i <input_file> -t`) for faster execution. Curious about underlying design decisions? Take a look at the `Tempus_Demo.html` document.
+Having trouble running any part of this code? Please contact me at bbowles1@alumni.nd.edu. 
+In a hurry? Run the script in "test" mode (`python vcf_annot.py -i <input_file> -t`) for faster execution. Curious about underlying design decisions? Take a look at the `Tempus_Demo.html` document.
 
 ## Running the Annotation Pipeline
 The general syntax for annotating an input VCF file is to run `python vcf_annot.py -i <input_file> -o <output_file>`. Users can also specify the following options:
@@ -30,3 +31,6 @@ This code is designed to run with minimal dependencies. You will require an inst
 ### Notes
 + This script requires VCF 4.0 format as input with 'TR' and 'TC' fields in the INFO column.
 + This script slightly expands dataframe size versus the initial input, as variants A) map to multiple unique genes, and B) some input variants contain multiple ALT calls at a single locus, which are expanded to separate rows.
+
+## Thank You!
+Thanks for considering me for open roles at Tempus! I take pride in my work ethic: if you've found any part of this assessment lacking, want to see additional functionality, or are having trouble running any aspect of this code, please contact me. I'd love to provide a solution to your needs (and I generally any chance to discuss computational biology with other researchers)!
