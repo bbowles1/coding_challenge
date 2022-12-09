@@ -6,8 +6,11 @@ All code is avaailable at [github.com/bbowles1/coding_challenge](https://github.
 
 ## Running the Annotation Pipeline
 The general syntax for annotating an input VCF file is to run `python vcf_annot.py -i <input_file> -o <output_file>`. Users can also specify the following options:
+
 -t: Run in "test mode," where a random subset of 250 input variants is selected to demo the pipeline functionality.
+
 -c: Annotate input variants with any matching Catalogue of Somatic Variants in Cancer (COSMIC) IDs. 
+
 -v: Verbose. If verbose, print summary statistics for read depth, variant supporting reads, and variant supporting read percent.
 
 ## The challenge: Prototype a variant interpretation tool to label the following.
