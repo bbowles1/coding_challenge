@@ -6,7 +6,8 @@ All code is avaailable at [github.com/bbowles1/coding_challenge](https://github.
 
 ## Running the Annotation Pipeline
 The general syntax for annotating an input VCF file is to run `python vcf_annot.py -i <input_file> -o <output_file>`. Users can also specify the following options:
--t: Run in "test mode," where a random subset of 250 input variants is selected to demo the pipeline functionality. 
+-t: Run in "test mode," where a random subset of 250 input variants is selected to demo the pipeline functionality.
+-c: Annotate input variants with any matching Catalogue of Somatic Variants in Cancer (COSMIC) IDs. 
 -v: Verbose. If verbose, print summary statistics for read depth, variant supporting reads, and variant supporting read percent.
 
 ## The challenge: Prototype a variant interpretation tool to label the following.
@@ -25,14 +26,14 @@ The general syntax for annotating an input VCF file is to run `python vcf_annot.
 + *Tempus_Demo.ipynb*: a Jupyter notebook walking through some of the design decisions for the variant interpreter.
 + *Tempus_Demo.html*: saved .html output from Tempus_Demo.ipynb.
 + *env.yml*: a full list of the dev environment packages for reference.
-+ *modles/tempustools*: multiple helper functions for VCF file process, API queries. 
++ *modles/tempustools*: multiple helper functions for VCF file processes and API queries. 
 
 ### Dependencies
 This code is designed to run with minimal dependencies. You will require an installation of the `requests` and `pandas` python libraries (preferably pandas 1.4). A full list of dependencies and my python version can be found in the env.yml file.
 
 ### Notes
 + This script requires VCF 4.0 format as input with 'TR' and 'TC' fields in the INFO column.
-+ This script slightly expands dataframe size versus the initial input, as variants A) map to multiple unique genes, and B) some input variants contain multiple ALT calls at a single locus, which are expanded to separate rows.
++ This script slightly expands dataframe size versus the initial input, as A) a single variant may, in rare cases, map to multiple genes, and B) some input variants contain multiple ALT calls at a single locus, which are expanded to separate rows.
 
 ## Thank You!
 Thanks for considering me for open roles at Tempus! I take pride in my work ethic: if you've found any part of this assessment lacking, want to see additional functionality, or are having trouble running any aspect of this code, please contact me. I'd love to provide a solution to your needs (and I generally any chance to discuss computational biology with other researchers)!

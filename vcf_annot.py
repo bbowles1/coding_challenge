@@ -34,6 +34,10 @@ parser.add_argument("-v", "--verbose", type=str, default='N', const='Y', nargs='
                    help='Display sumary stats for depth, variant read count, and variant read percentage? Y/N')
 parser.add_argument("-t", "--test", type=str, default='N', const='Y', nargs='?',
                    help='Annotate a random test subset of the input VCF? Y/N')
+parser.add_argument("-c", "--cosmic", type=str, default='N', const='Y', nargs='?',
+                   help='Annotate variants with COSMIC IDs? Y/N')
+
+# print help if no arguments provided
 if len(sys.argv)==1:
     parser.print_help(sys.stderr)
     sys.exit(1)
@@ -41,6 +45,10 @@ args = parser.parse_args()
 
 if args.verbose.lower() not in ['y','n']:
     raise Exception("Invalid input for 'verbose' option. Please provide a Y or N.")
+if args.test.lower() not in ['y','n']:
+    raise Exception("Invalid input for 'test' option. Please provide a Y or N.")
+if args.cosmic.lower() not in ['y','n']:
+    raise Exception("Invalid input for 'cosmic' option. Please provide a Y or N.")
 
 # set up module import
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -95,16 +103,9 @@ df.rename(columns={'TC':'depth', 'TR':'var_reads'}, inplace=True)
 # format an API query column in our data
 df['apiq'] = df.apply(lambda row: ' '.join([str(i) for i in [row.CHROM, ' ', row.POS, " .", row.REF, row.ALT, ".", ".", "."]]), axis=1)
 
-
-
 # run VEP query
 decoded = tt.vepquery(df, 200)   
-print('Query completing. Formatting result.')
 
-
-
-
- 
 
 # take json output and unpack annotations
 decoded = decoded.explode('transcript_consequences')
@@ -143,7 +144,7 @@ decoded.loc[decoded.hgvsc.notna(), 'hgvsc'] = decoded.loc[decoded.hgvsc.notna()]
 
 # fill nan
 decoded.effect.fillna('intergenic', inplace=True)
-decoded.fillna('None', inplace=True)
+decoded.fillna('.', inplace=True)
 
 # merge back to original df
 decoded.loc[:, 'apiq'] = decoded.apiq.str.replace(' ','')
@@ -155,19 +156,35 @@ cols = ['CHROM','POS', 'REF', 'ALT', 'depth', 'var_reads', 'var_perc',
         'variant_class', 'gene_symbol', 'gene_id', 'effect', 'hgvsc']
 df = df[cols]
 
-print(' VEP annotation complete.')
+print('VEP region-matching complete.')
 
 
 
 
 
-print('Querying MAF.')
+print('Querying allele frquency.')
 
 # get test data
 df['apiq'] = df.hgvsc.str.split(',').str[0]
 
 # query MAF information
 maf = tt.mafquery(df[['CHROM','apiq']].drop_duplicates())
+
+if args.cosmic.lower() == 'y':
+    # find cosmic entries in 'colocated variants' col
+    maf['cosmic'] = maf.colocated_variants
+    maf.loc[maf.cosmic.notna(), 'cosmic'] = maf.loc[maf.cosmic.notna()].cosmic.apply(lambda x: [j for j in [
+        i['id'] for i in x if 'id' in i] if 'COSV' in j])
+
+    # format column entries, grab correct ID from cols with multiple COSMIC entries    
+    maf.loc[maf.cosmic.str.len()>1, 'cosmic'] = maf.loc[maf.cosmic.str.len()>1].cosmic.str[0]
+    mapper = maf.loc[maf.cosmic.astype(bool) & maf.cosmic.notna()][['apiq','cosmic']]
+    mapper.loc[:, 'cosmic'] = mapper.cosmic.str[0]
+    mapper = mapper[['apiq','cosmic']].dropna()
+
+    # map COSMIC entries back to df 
+    mapper = dict(zip(mapper.apiq, mapper.cosmic))
+    df['cosmic'] = df.apiq.map(mapper)
 
 # drop entries within co_vars that do not contain frequencies info
 maf.loc[maf.colocated_variants.notna(), 'colocated_variants'] = maf.colocated_variants.dropna().apply(
@@ -184,12 +201,19 @@ maf = maf[['apiq', 'minor_allele_freq']].drop_duplicates()
 # merge back to df, fill nan
 df = df.merge(maf, how='left', on='apiq')
 df.loc[:, 'minor_allele_freq'] = df.minor_allele_freq.fillna(0)
+df.loc[:, 'cosmic'] = df.cosmic.fillna('.')
 
 # subset to output cols
-df = df[ cols+['minor_allele_freq'] ]
+if args.cosmic.lower() == 'y':
+    df = df[ cols+['minor_allele_freq','cosmic'] ]
+else:
+    df = df[ cols+['minor_allele_freq'] ]
 
-print('MAF query complete.')
+# sort data by CHROM and POS
+df = tt.sort(df)
 
+# save output
+print('All annotations completed!')
 df.to_csv(args.output, sep='\t', index=False)
 
 

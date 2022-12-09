@@ -228,3 +228,84 @@ def mafquery(df, size=200):
         
     return (decoded)
 
+
+def sort(input_df): # takes BED and VCF type files
+    
+    # sorts an input df with CHROM, POS columns. Does not work for BED files.
+    if all([i in input_df.columns for i in ['CHROM','POS']]):
+    
+        # flag for CHROM formatting
+        chrflag = False
+        
+        # check POS format
+        input_df.loc[:, 'POS'] = input_df.POS.astype(int)
+            
+        if input_df.CHROM.str.contains('chr').any():
+            chrflag = True
+        
+        # strip chr format from input_df
+        input_df.loc[:, 'CHROM'] = input_df.CHROM.astype(str).str.replace('chr','')
+        
+        # create a list of all 23 chromosome, impose order on input df
+        chrom_list = [str(i) for i in (list(range(1,23)))]
+        chrom_list.append('X')
+        chrom_list.append('Y')
+        index_order = [i for i in chrom_list if i in input_df.CHROM.astype(str).str.strip('chr').to_list()]
+        input_df.loc[:, 'CHROM'] = input_df.CHROM.astype(str)
+        input_df.set_index('CHROM', inplace=True)
+        input_df = input_df.loc[index_order, :]
+        
+        if chrflag == True:
+            # pop out chrom index, reset to "chr#" format
+            input_df.reset_index(inplace=True)
+            input_df.loc[:, 'CHROM'] = 'chr'+ input_df.CHROM
+        else:
+            input_df.reset_index(inplace=True)
+    
+        # use groupby to sort by POS
+        input_df = input_df.groupby('CHROM').apply(lambda x: x.sort_values(by='POS', ascending=True)).reset_index(drop=True)
+        
+        return(input_df)
+    
+    # sorts an input df with CHROM, POS columns. Does not work for VCF files.
+    elif all([i in input_df.columns for i in ['chrom','chromStart', 'chromEnd']]):
+            
+        # flag for chrom formatting
+        chrflag = False
+        
+        # check POS format
+        input_df.loc[:, 'chromStart'] = input_df.chromStart.astype(int)
+        input_df.loc[:, 'chromEnd'] = input_df.chromEnd.astype(int)
+            
+        if input_df.chrom.str.contains('chr').any():
+            chrflag = True
+            
+        # strip chr format from input_df
+        input_df.loc[:, 'chrom'] = input_df.chrom.astype(str).str.replace('chr','')
+        
+        # create a list of all 23 chromosomes
+        chrom_list = [str(i) for i in (list(range(1,23)))]
+        chrom_list.append('X')
+        chrom_list.append('Y')
+        index_order = [i for i in chrom_list if i in input_df.chrom.astype(str).str.strip('chr').to_list()]
+        input_df.loc[:, 'chrom'] = input_df.chrom.astype(str)
+        input_df.set_index('chrom', inplace=True)
+        input_df = input_df.loc[index_order, :]
+        
+        if chrflag == True:
+            # pop out chrom index, reset to "chr#" format
+            input_df.reset_index(inplace=True)
+            input_df.loc[:, 'chrom'] = 'chr'+ input_df.chrom
+        else:
+            input_df.reset_index(inplace=True)
+        
+        # use groupby to sort by chromStart, chromEnd
+        input_df = input_df.groupby('chrom').apply(lambda x: x.sort_values(by=(['chromStart','chromEnd']), ascending=True)).reset_index(drop=True)
+        
+        return(input_df)
+    
+    else:
+        print('Could not detect input format - missing required VCF (chrom, POS) or BED (chrom, chromStart, chromEnd) columns!')
+        return(input_df)
+
+
